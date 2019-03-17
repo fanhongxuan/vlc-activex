@@ -1,0 +1,112 @@
+Changes between VLC plugins 2.2.0 and 2.2.1:
+--------------------------------------------
+
+ActiveX:
+ * Fix vlc.*.track indexes
+
+
+Changes between VLC plugins 2.1.0 and 2.2.0:
+--------------------------------------------
+
+NPAPI Core:
+ * Support vlc.playlist.currentItem
+ * Various fixes and large cleanups
+ * Listen to MediaPlayerMediaChanged event
+ * More lax acceptance of parameters style
+
+ActiveX:
+ * Match support to NPAPI
+ * Fix compilation for 64bits
+ * Support "type" attribute
+ * Fix registration in IE10
+ * Implement versionInfo()
+ * Fix position event
+ * Add MediaPlayerMediaChanged, MediaPlayerTitleChanged and MediaPlayerTitleChanged
+
+Mac:
+ * New MacOS video output based on CoreAnimation
+ * Universal Binary for 32 and 64 bit browsers
+ * Fix fullscreen video output on some setups
+ * Fix support for Safari 5 on OS X 10.6 and later
+ * Fix compilation with clang++
+ * Fix compilation with Xcode5 and Mavericks
+ * Add support for 'bgcolor', 'branding' and 'toolbar'
+
+
+Changes between VLC plugins 2.0.6 and 2.1.0:
+--------------------------------------------
+
+NPAPI core:
+ * libVLC 2.0.0 is now required
+
+Platforms:
+ * New MacOS windowed rendering path, using CoreGraphics
+
+
+Changes between VLC 2.0.2 and 2.0.6:
+------------------------------------
+
+Common:
+ * Upgrade the libVLC wrapper
+ * Improve packaging on most platforms
+ * Optionnal toolbars display in webview and in fullscreen
+ * Quit fullscreen with Esc key
+ * Fix background color
+ * Fix memory and handle leaks
+
+Webpages:
+ * Update classic test pages
+ * Add jQuery class to control the webplugin
+ * Add VLCObject and VLCControl classes to control the webplugin
+ * Add Windowless and resize test pages
+
+NPAPI core:
+ * Core class rework and redesign
+ * Windowless support
+ * Drop OJI support
+ * Fix browser events propagation in NPAPI
+ * Drop the dependency on external NPAPI headers: it will get downloaded
+
+ActiveX:
+ * ActiveX: first step of Win64 support
+ * Fix events propagation
+ * Fix memory cleaning on unload
+
+Platforms:
+ * Support for Windowless under X11 with XCB
+ * Support for Windowless under Mac OS X using CoreGraphics
+ * Support for Windowless under Windows using GDI+
+ * Re-write Mac OS X Port to use CoreAnimation for Windowed video playback
+ * Support for Mac OS X 64 bits
+ * Support for Windows 64 bits
+
+
+Changes between VLC 2.0.0 and 2.0.2:
+-----------------------------------
+ * introduce MediaDescription object for exposing media meta information
+ * Build and leaks fixes
+ * marquee text size fix
+
+
+Changes between VLC 1.1.4 and 2.0.0:
+-----------------------------------
+
+ * Mozilla and ActiveX plugin separated from the main VLC source,
+   and merged in the same repo, for better release management.
+ * Fullscreen Interface on Win32 for both ActiveX and NPAPI.
+ * Toolbar and fullscreen Interface on Linux/Unix using Gtk+
+ * Many build fixes and improvements.
+ * Compilation and project files for VS2008.
+ * Port to Win64.
+ * Interface for DVD control.
+ * Update to recent NPAPI headers and better support for those.
+ * Removal of Xt and Xpm dependencies, allowing load on Chromium.
+ * Fix of the Secunia advisory SA41810
+ * Fixes for numerous long-standing issues (notably #3374, #3419, #1553, #3729,
+   #4286, #5138, #3819)
+ * Support the bgcolor attribute to change the background color
+ * Better support for multi-monitor fullscreen
+ * Move to Xcb libraries from Xlib when Gtk+ is not used on X11 platforms
+ * Numerous fixes for Opera and Konqueror
+ * New options to disable fullscreen and toolbars for the webpages developers
+

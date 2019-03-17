@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+	<head>
+		<title>VLC Resizing Test Page</title>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+		<style>
+			#video_window {
+				position: absolute;
+				left: 50px;
+				top: 50px;
+				width: 533px;
+				height: 300px;
+			}
+		</style>
+		<script language="Javascript">
+			var isMoving = false;
+			var isResizing = false;
+
+			var movingOutProperties = {
+				left: "150px",
+				top: "150px"
+			};
+			var movingBackProperties = {
+				left: "50px",
+				top: "50px"
+			};
+			var resizeOutProperties = {
+				width: "1066px",
+				height: "600px"
+			};
+			var resizeBackProperties = {
+				width: "533px",
+				height: "300px"
+			};
+
+			function ToggleMoving()
+			{
+				isMoving = !isMoving;
+
+				if(isMoving)
+					MoveOut();
+			}
+
+			function MoveOut()
+			{
+				if(!isMoving)
+					return;
+
+				$("#video_window").animate(movingOutProperties, 1000, "swing", MoveBack);
+			}
+
+			function MoveBack()
+			{
+				if(!isMoving)
+					return;
+
+				$("#video_window").animate(movingBackProperties, 1000, "swing", MoveOut);
+			}
+
+			function ToggleResizing()
+			{
+				isResizing = !isResizing;
+
+				if(isResizing)
+					ResizeOut();
+			}
+
+			function ResizeOut()
+			{
+				if(!isResizing)
+					return;
+
+				$("#video_window").animate(resizeOutProperties, 1000, "swing", ResizeBack);
+			}
+
+			function ResizeBack()
+			{
+				if(!isResizing)
+					return;
+
+				$("#video_window").animate(resizeBackProperties, 1000, "swing", ResizeOut);
+			}
+		</script>
+	</head>
+	<body>
+		<input type="button" onclick="ToggleResizing()" value="Toggle Resizing"/>
+		<input type="button" onclick="ToggleMoving()" value="Toggle Moving"/>
+		<div id="video_window">
+			<embed	type="application/x-vlc-plugin"
+					version="VideoLAN.VLCPlugin.2"
+					width="100%" height="100%"
+					target="http://streams.videolan.org/streams/mp4/h264-sample-thefluff.mp4"
+					toolbar="false"
+					id="vlc_control"
+					>
+			</embed>
+		</div>
+	</body>
+</html>

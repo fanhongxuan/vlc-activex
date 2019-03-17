@@ -1,0 +1,83 @@
+<html>
+<!--
+<OWNER> = revolunet
+<ORGANIZATION> = revolunet - Julien Bouquillon
+<YEAR> = 2010
+
+Copyright (c) 2010, revolunet
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met :
+
+
+ Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. 
+ Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. 
+ Neither the name of the <ORGANIZATION> nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission. 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES ; LOSS OF USE, DATA, OR PROFITS ; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+-->
+    <head>
+    
+    <!-- you dont need to host these files -->
+    <script language="javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script language="javascript" src="http://revolunet.github.com/VLCcontrols/src/jquery-vlc.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://revolunet.github.com/VLCcontrols/src/styles.css" />
+    
+    
+        <script language="javascript">
+          
+            function play(instance, uri) {
+                VLCobject.getInstance(instance).play(uri);
+            }
+            
+            function addvlc() {
+                var r = parseInt(Math.random()*1000);
+                 var added = $('#vlc2').append('<div id="'+r+'">&nbsp;</div>');
+           
+                 
+                 var newp = VLCobject.embedPlayer(r, 400, 300, true);
+                 newp.queue('http://www.revolunet.com/static/download/labo/VLCcontrols/bunny.mp4');
+            }   
+            
+             var player = null;
+             
+            $(document).ready(function() {
+                
+                player = VLCobject.embedPlayer('vlc1', 400, 300, true);
+               // player.play('http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_480p_surround-fix.avi');
+                //player.play('http://www.revolunet.com/static/download/labo/VLCcontrols/bunny.mp4');
+                
+                // var player2 = VLCobject.embedPlayer('vlc2', 160, 120, true);
+                // player2.play('http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_480p_surround-fix.avi');
+                
+                
+              //  http://www.revolunet.com/static/download/labo/VLCcontrols/bunny.mp4
+                //VLCobject.addToolbar('vlc1');
+            });
+
+        </script>
+        <style>
+            body {
+                font-family:courier
+            }
+            
+        </style>
+
+    </head>
+    <body>
+        <h3>jQuery + VLC plugin demo</h3>
+        <p>Simple VLC plugin integration with <a href='http://www.revolunet.Com'>revolunet</a> <a href='http://github.com/revolunet/VLCcontrols'>VLCcontrols widget</a></p>
+        <div id='vlc1'>player 1</div>
+        <br><br>
+        
+        <input id='uri' value='http://www.revolunet.com/static/download/labo/VLCcontrols/bunny.mp4' size=70 type='text'><button onclick="play('vlc1', $('#uri').val())">play</button>
+        <br><br>
+        <input id='uri2' value='http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_480p_surround-fix.avi' size=70 type='text'><button onclick="play('vlc1', $('#uri2').val())">play</button>
+        <br><br>
+        <button onclick="addvlc()">load a new VLC</button>
+        <div id='vlc2'>player 2</div>
+
+    
+    </body>
+</html> 

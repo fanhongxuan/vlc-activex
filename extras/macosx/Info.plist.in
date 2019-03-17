@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>VLC-Plugin</string>
+	<key>CFBundleGetInfoString</key>
+	<string>VLC media player Web Plugin @VERSION@</string>
+	<key>CFHumanReadableCopyright</key>
+	<string>Copyright © @COPYRIGHT_YEARS@ VideoLAN and authors</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.videolan.vlc-npapi-plugin</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>VLC Web Plugin</string>
+	<key>CFBundlePackageType</key>
+	<string>BRPL</string>
+	<key>CFBundleSignature</key>
+	<string>MOSS</string>
+	<key>CFBundleVersion</key>
+	<string>@VERSION@</string>
+	<key>CFBundleShortVersionString</key>
+	<string>@VERSION@</string>
+	<key>CSResourcesFileMapped</key>
+	<true/>
+	<key>LSMinimumSystemVersionByArchitecture</key>
+	<dict>
+		<key>i386</key>
+		<string>10.5.8</string>
+		<key>x86_64</key>
+		<string>10.6.0</string>
+	</dict>
+    <key>LSArchitecturePriority</key>
+	<array>
+		<string>x86_64</string>
+		<string>i386</string>
+	</array>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>http://update.videolan.org/vlc/sparkle/vlc-intel64.xml</string>
+	<key>WebPluginName</key>
+	<string>VLC Web Plugin</string>
+	<key>WebPluginDescription</key>
+	<string>@COPYRIGHT_MESSAGE@&lt;BR&gt;&lt;A HREF="http://www.videolan.org"&gt;http://www.videolan.org&lt;/A&gt;</string>
+	<key>WebPluginMIMETypes</key>
+	<dict>
+		<key>audio/mpeg</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>mp2</string>
+				<string>mp3</string>
+				<string>mpga</string>
+				<string>mpega</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>MPEG audio</string>
+		</dict>
+		<key>audio/x-mpeg</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>mp2</string>
+				<string>mp3</string>
+				<string>mpga</string>
+				<string>mpega</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>MPEG audio</string>
+		</dict>
+		<key>video/mpeg</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>mpg</string>
+				<string>mpeg</string>
+				<string>m1v</string>
+				<string>mpeg1</string>
+				<string>mpeg2</string>
+				<string>mpe</string>
+				<string>m2v</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>MPEG video</string>
+		</dict>
+		<key>video/x-mpeg</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>mpg</string>
+				<string>mpeg</string>
+				<string>m1v</string>
+				<string>mpeg1</string>
+				<string>mpeg2</string>
+				<string>mpe</string>
+				<string>m2v</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>MPEG video</string>
+		</dict>
+		<key>video/mpeg-system</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>mpg</string>
+				<string>mpeg</string>
+				<string>m1v</string>
+				<string>mpeg1</string>
+				<string>mpeg2</string>
+				<string>m2v</string>
+				<string>vob</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>MPEG video</string>
+		</dict>
+		<key>video/x-mpeg-system</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>mpg</string>
+				<string>mpeg</string>
+				<string>m1v</string>
+				<string>mpeg1</string>
+				<string>mpeg2</string>
+				<string>m2v</string>
+				<string>vob</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>MPEG video</string>
+		</dict>
+		<key>audio/mp4</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>mp4</string>
+				<string>mpg4</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>MPEG-4 audio</string>
+		</dict>
+		<key>audio/x-m4a</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>m4a</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>MPEG-4 audio</string>
+		</dict>
+		<key>video/mp4</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>mp4</string>
+				<string>mpg4</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>MPEG-4 video</string>
+		</dict>
+		<key>application/mpeg4-iod</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>mp4</string>
+				<string>mpg4</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>MPEG-4 video</string>
+		</dict>
+		<key>application/mpeg4-muxcodetable</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>mp4</string>
+				<string>mpg4</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>MPEG-4 video</string>
+		</dict>
+		<key>video/x-m4v</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>m4v</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>MPEG-4 video</string>
+		</dict>
+		<key>video/mp2t</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>ts</string>
+				<string>m2ts</string>
+				<string>mts</string>
+				<string>mt2s</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>MPEG-2 Transport Stream</string>
+		</dict>
+		<key>video/x-msvideo</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>avi</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>AVI video</string>
+		</dict>
+		<key>application/ogg</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>ogg</string>
+				<string>ogm</string>
+				<string>spx</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>Ogg stream</string>
+		</dict>
+		<key>video/ogg</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>ogv</string>
+				<string>ogm</string>
+				<string>ogg</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>Ogg video</string>
+		</dict>
+		<key>application/x-ogg</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>ogg</string>
+				<string>ogx</string>
+				<string>spx</string>
+				<string>ogm</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>Ogg stream</string>
+		</dict>
+		<key>audio/ogg</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>oga</string>
+				<string>opus</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>Ogg video</string>
+		</dict>
+		<key>application/mxf</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>mxf</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>MXF video</string>
+		</dict>
+		<key>application/x-vlc-plugin</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>vlc</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>VLC plugin</string>
+		</dict>
+		<key>video/x-ms-asf-plugin</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>asf</string>
+				<string>asx</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>Windows Media video</string>
+		</dict>
+		<key>video/x-ms-asf</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>asf</string>
+				<string>asx</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>Windows Media video</string>
+		</dict>
+		<key>application/x-mplayer2</key>
+		<dict>
+			<key>WebPluginTypeDescription</key>
+			<string>Windows Media plug-in</string>
+		</dict>
+		<key>video/x-ms-wmv</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>wmv</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>Windows Media video</string>
+		</dict>
+		<key>video/x-ms-wvx</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>wvx</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>Windows Media video</string>
+		</dict>
+		<key>video/x-ms-wma</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>wma</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>Windows Media audio</string>
+		</dict>
+		<key>application/x-google-vlc-plugin</key>
+		<dict>
+			<key>WebPluginTypeDescription</key>
+			<string>Google VLC plug-in</string>
+		</dict>
+		<key>audio/wav</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>wav</string>
+				<string>wv</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>WAV audio</string>
+		</dict>
+		<key>audio/x-wav</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>wav</string>
+				<string>wv</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>WAV audio</string>
+		</dict>
+		<key>audio/3gpp</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>3gp</string>
+				<string>3gpp</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>3GPP audio</string>
+		</dict>
+		<key>video/3gpp</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>3gp</string>
+				<string>3gpp</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>3GPP video</string>
+		</dict>
+		<key>audio/3gpp2</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>3g2</string>
+				<string>3gpp2</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>3GPP2 audio</string>
+		</dict>
+		<key>video/3gpp2</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>3g2</string>
+				<string>3gpp2</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>3GPP2 video</string>
+		</dict>
+		<key>video/divx</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>divx</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>DivX video</string>
+		</dict>
+		<key>video/flv</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>flv</string>
+				<string>f4v</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>FLV video</string>
+		</dict>
+		<key>video/x-flv</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>flv</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>FLV video</string>
+		</dict>
+		<key>application/x-matroska</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>mkv</string>
+				<string>mks</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>MKV video</string>
+		</dict>
+		<key>video/x-matroska</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>mkv</string>
+				<string>mks</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>MKV video</string>
+		</dict>
+		<key>audio/x-matroska</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>mka</string>
+				<string>mks</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>MKV audio</string>
+		</dict>
+		<key>application/xspf+xml</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>xspf</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>XSPF playlist</string>
+		</dict>
+		<key>audio/x-mpegurl</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>m3u</string>
+				<string>m3u8</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>M3U playlist</string>
+		</dict>
+		<key>video/webm</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>webm</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>Webm video</string>
+		</dict>
+		<key>audio/webm</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>webm</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>Webm audio</string>
+		</dict>
+		<key>application/vnd.rn-realmedia</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>rm</string>
+				<string>rmvb</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>Real Media</string>
+		</dict>
+		<key>audio/x-realaudio</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>ra</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>Real audio</string>
+		</dict>
+		<key>audio/amr</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>amr</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>AMR audio</string>
+		</dict>
+		<key>audio/x-flac</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>flac</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>FLAC audio</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

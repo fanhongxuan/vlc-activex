@@ -1,0 +1,7 @@
+axvlc.vcproj.*.user
+axvlc.suo
+axvlc.ncb
+debug/*
+release/*
+axvlc_i.c
+axvlc_h.h

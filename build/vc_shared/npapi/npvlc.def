@@ -1,0 +1,5 @@
+LIBRARY NPVLC.DLL
+EXPORTS
+    NP_GetEntryPoints
+    NP_Initialize
+    NP_Shutdown

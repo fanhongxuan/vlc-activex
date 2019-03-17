@@ -1,0 +1,52 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+//  VLC Plugin description.
+//
+#define VERSION_NUMBER @VERSION_MAJOR@,@VERSION_MINOR@,@VERSION_REVISION@,@VERSION_EXTRA_RC@
+
+//VS_VERSION_INFO VERSIONINFO
+1 VERSIONINFO
+ FILEVERSION VERSION_NUMBER
+ PRODUCTVERSION VERSION_NUMBER
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "VideoLAN\0"
+            VALUE "ProductName", "VLC Web Plugin\0"
+            VALUE "ProductVersion", "@VERSION@"
+            VALUE "InternalName", "npvlc\0"
+            VALUE "OriginalFilename", "npvlc.dll\0"
+            VALUE "FileVersion", "@VERSION@"
+            VALUE "FileDescription", "VLC media player Web Plugin\0"
+            VALUE "LegalCopyright", "Copyright \251 @COPYRIGHT_YEARS@ VideoLAN and VLC Authors\0"
+            VALUE "LegalTrademarks", "VLC media player, VideoLAN and x264 are registered trademarks from VideoLAN\0"
+            VALUE "MIMEType", "audio/mpeg|audio/x-mpeg|video/mpeg|video/x-mpeg|video/mpeg-system|video/x-mpeg-system|audio/mp4|audio/x-m4a|video/mp4|application/mpeg4-iod|application/mpeg4-muxcodetable|video/x-m4v|video/x-msvideo|application/ogg|video/ogg|application/x-ogg|application/x-vlc-plugin|video/x-ms-asf-plugin|video/x-ms-asf|application/x-mplayer2|video/x-ms-wmv|video/x-ms-wvx|audio/x-ms-wma|application/x-google-vlc-plugin|audio/wav|audio/x-wav|audio/3gpp|video/3gpp|audio/3gpp2|video/3gpp2|video/divx|video/flv|video/x-flv|application/x-matroska|video/x-matroska|audio/x-matroska|application/xspf+xml|audio/x-mpegurl|video/webm|audio/webm|application/vnd.rn-realmedia|audio/x-realaudio|audio/amr|audio/x-flac\0"
+            VALUE "FileExtents", "mp2,mp3,mpga,mpega|mp2,mp3,mpga,mpega|mpg,mpeg,mpe|mpg,mpeg,mpe|mpg,mpeg,mpe,vob|mpg,mpeg,mpe,vob|aac,mp4,mpg4|m4a|mp4,mpg4|mp4,mpg4|mp4,mpg4|m4v|avi|ogg|ogv|ogg||asf,asx|asf,asx||wmv|wvx|wma||wav|wav|3gp,3gpp|3gp,3gpp|3g2,3gpp2|3g2,3gpp2|divx|flv|flv|mkv|mkv|mka|xspf|m3u|webm|webm|rm|ra|amr|flac\0"
+            VALUE "FileOpenName", "MPEG audio|MPEG audio|MPEG video|MPEG video|MPEG video|MPEG video|MPEG-4 audio|MPEG-4 audio|MPEG-4 video|MPEG-4 video|MPEG-4 video|MPEG-4 video|AVI video|Ogg stream|Ogg video|Ogg stream|VLC plug-in|Windows Media Video|Windows Media Video|Windows Media|Windows Media|Windows Media Video|Windows Media Audio|Google VLC plug-in|WAV audio|WAV audio|3GPP audio|3GPP video|3GPP2 audio|3GPP2 video|DivX video|FLV video|FLV video|Matroska video|Matroska video|Matroska audio|Playlist xspf|MPEG audio|WebM video|WebM audio|Real Media File|Real Media Audio|AMR audio|FLAC audio\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+3 BITMAP DISCARDABLE "../share/pixmaps/win32/defullscreen.bmp"
+4 BITMAP DISCARDABLE "../share/pixmaps/win32/play.bmp"
+5 BITMAP DISCARDABLE "../share/pixmaps/win32/pause.bmp"
+6 BITMAP DISCARDABLE "../share/pixmaps/win32/volume.bmp"
+7 BITMAP DISCARDABLE "../share/pixmaps/win32/volume-muted.bmp"
+8 ICON   DISCARDABLE "../share/pixmaps/win32/vlc.ico"
+9 BITMAP DISCARDABLE "../share/pixmaps/win32/fullscreen.bmp"

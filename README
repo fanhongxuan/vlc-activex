@@ -1,0 +1,22 @@
+README
+------
+
+This repository contains the Webplugins based on libVLC.
+One of them is an ActiveX plug-in, the other is an NPAPI one.
+
+Those plugins are licensed under the GPLv2+ license.
+
+More information can be found on videolan.org.
+
+
+How to build
+------------
+
+You should be able to build it under Linux, Unix, Mac OS and Mingw/MSys
+
+To build this plugin from a source checkout, you should:
+ - run `sh autogen.sh'
+ - run `./configure'
+ - run `make'
+
+On Windows, you should also build it from Visual Studio
