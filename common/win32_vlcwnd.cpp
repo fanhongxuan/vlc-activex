@@ -95,7 +95,8 @@ bool VLCWnd::CreateEx(DWORD dwExStyle, LPCTSTR lpWindowName, DWORD dwStyle,
     ::CreateWindowEx(dwExStyle, wc.lpszClassName, lpWindowName, dwStyle,
                      x, y, nWidth, nHeight,
                      hWndParent, hMenu, _hInstance, (LPVOID)this);
-
+	mWidth = nWidth;
+	mHeight = nHeight;
     return _hWnd != 0;
 }
 
@@ -108,4 +109,8 @@ VLCWnd::~VLCWnd()
         if( UnregisterClass(MAKEINTATOM(_wndclass_atom), _hInstance) )
             _wndclass_atom = 0;
     }
+	if (NULL != mpBuffer){
+		delete []mpBuffer;
+		mpBuffer = NULL;
+	}
 }

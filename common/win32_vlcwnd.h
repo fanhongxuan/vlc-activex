@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright © 2002-2011 VideoLAN and VLC authors
+ * Copyright ?2002-2011 VideoLAN and VLC authors
  * $Id$
  *
  * Authors: Sergey Radionov <rsatom@gmail.com>
@@ -28,7 +28,7 @@ class VLCWnd
 {
 protected:
     VLCWnd(HINSTANCE hInstance)
-        : _hInstance(hInstance), _wndclass_atom(0), _hWnd(0){};
+		: _hInstance(hInstance), _wndclass_atom(0), _hWnd(0), mWidth(0), mHeight(0), mFrameCount(0), mpBuffer(NULL){};
     virtual ~VLCWnd();
 
     bool Create(LPCTSTR lpWindowName, DWORD dwStyle,
@@ -47,7 +47,11 @@ protected:
 
 public:
     HWND hWnd() const {return _hWnd;}
-
+public:
+    int mWidth;
+    int mHeight;
+	int mFrameCount;
+	unsigned char *mpBuffer;
 private:
     bool RegisterClass(WNDCLASS* wc);
 

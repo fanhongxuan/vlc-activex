@@ -25,7 +25,7 @@
 #define VLC_FULLSCREEN_H
 
 #ifdef _WIN32
-
+#include <vector>
 #include "win32_vlcwnd.h"
 #include "vlc_player_options.h"
 #include "vlc_player.h"
@@ -143,6 +143,36 @@ private:
 //class VLCHolderWnd
 ////////////////////////////////////////////////////////////////////////////////
 class VLCWindowsManager;
+class vaLine
+{
+private:
+    bool mbStart;
+public:
+    vaLine(){
+        startX = -1, startY = -1, endX = -1, endY = -1; 
+        mbStart = false;
+    }
+    
+    vaLine(vaLine &other)
+    {
+        startX = other.startX;
+        startY = other.startY;
+        endX = other.endX;
+        endY = other.endY;
+        mbStart = other.mbStart;
+    }
+    
+    bool IsStart(){return mbStart;}
+    void Reset(){mbStart = false; startX = -1; startY = -1; endX = -1; endY = -1;}
+    void Start(int x, int y){startX = x;startY = y; mbStart = true;}
+    void Stop(int x, int y){endX = x;endY = y;}
+    
+    int startX;
+    int startY;
+    int endX;
+    int endY;
+};
+
 class VLCHolderWnd: public VLCWnd
 {
 public:
@@ -156,7 +186,8 @@ protected:
         : VLCWnd(hInstance), _hMouseHook(NULL), _MouseHookThreadId(0),
          _wm(WM), _hBgBrush(0), _CtrlsWnd(0) {};
     bool Create(HWND hWndParent);
-
+    void onPaint(HDC hDC);
+    void ClearAllLines();
     virtual void PreRegisterWindowClass(WNDCLASS* wc);
     virtual LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -174,7 +205,8 @@ public:
 
 private:
     static LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
-
+    vaLine mCurLine;
+    std::vector<vaLine *> mLines;
     HWND FindMP_hWnd();
 
     HHOOK _hMouseHook;

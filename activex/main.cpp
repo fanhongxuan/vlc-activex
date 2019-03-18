@@ -287,8 +287,7 @@ static HRESULT RegisterClassID(HKEY hParent, REFCLSID rclsid, unsigned int versi
 
 #ifdef BUILD_LOCALSERVER
         // LocalServer32 key value
-        keyClose(keySetDef(keyCreate(hClassKey,
-            TEXT("LocalServer32"), path, sizeof(TCHAR)*(pathLen+1))));
+        keyClose(keySetDef(keyCreate(hClassKey,TEXT("LocalServer32")), path, sizeof(TCHAR)*(pathLen+1)));
 #else
         // InprocServer32 key value
         {
@@ -427,6 +426,7 @@ STDAPI_(int) WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
         return 0;
 
     DWORD dwRegisterActiveObject;
+	DWORD dwRegisterActiveObject2;
 
     if( FAILED(RegisterActiveObject(classProc, CLSID_VLCPlugin,
                     ACTIVEOBJECT_WEAK, &dwRegisterActiveObject)) )

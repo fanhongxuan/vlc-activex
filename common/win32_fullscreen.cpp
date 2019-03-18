@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc_win32_fullscreen.h: a VLC plugin for Mozilla
  *****************************************************************************
- * Copyright © 2002-2011 VideoLAN and VLC authors
+ * Copyright 2002-2011 VideoLAN and VLC authors
  * $Id$
  *
  * Authors: Sergey Radionov <rsatom@gmail.com>
@@ -24,10 +24,11 @@
 #include "config.h"
 #endif
 
+
 #include <windows.h>
 #include <commctrl.h>
 #include <uxtheme.h>
-
+#include <windowsx.h>
 #include "win32_fullscreen.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -633,6 +634,54 @@ void VLCHolderWnd::PreRegisterWindowClass(WNDCLASS* wc)
     wc->lpszClassName = TEXT("Web Plugin VLC Window Holder Class");
 }
 
+void VLCHolderWnd::onPaint(HDC hDC)
+{
+    HDC hMemory = CreateCompatibleDC(hDC);
+    if (NULL == hMemory){
+        return;
+    }
+    BITMAPINFO info;
+    info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    info.bmiHeader.biWidth = mWidth;
+    info.bmiHeader.biHeight = - mHeight;
+    info.bmiHeader.biPlanes = 1;
+    info.bmiHeader.biBitCount = 32;
+    info.bmiHeader.biCompression = BI_RGB;
+    info.bmiHeader.biSizeImage = 0;
+    info.bmiHeader.biXPelsPerMeter = 3000;
+    info.bmiHeader.biYPelsPerMeter = 3000;
+    info.bmiHeader.biClrUsed = 0;
+    info.bmiHeader.biClrImportant = 0;
+    HBITMAP hBitmap = CreateCompatibleBitmap(hDC, mWidth, mHeight);
+    SelectObject(hMemory, hBitmap);
+    SetDIBits(hMemory, hBitmap, 0, mHeight, mpBuffer, &info, DIB_RGB_COLORS);
+
+    HPEN hPen = CreatePen(PS_SOLID, 5, RGB(255,0,0));
+    SelectObject(hMemory, hPen);
+    for (int i = 0; i < mLines.size(); i++){
+        vaLine *pLine = mLines[i];
+        if (NULL != pLine){
+            MoveToEx(hMemory, pLine->startX, pLine->startY, NULL);
+            LineTo(hMemory, pLine->endX, pLine->endY);
+        }
+    }    
+    BitBlt(hDC, 0, 0, mWidth, mHeight, hMemory, 0, 0, SRCCOPY);
+
+    DeleteDC(hMemory);
+    
+}
+
+void VLCHolderWnd::ClearAllLines()
+{
+    for (int i = 0; i < mLines.size(); i++){
+        vaLine *pLine = mLines[i];
+        delete pLine;
+        mLines[i] = NULL;
+    }
+    mLines.clear();
+    InvalidateRect(hWnd(), NULL, TRUE);
+}
+
 LRESULT VLCHolderWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch( uMsg )
@@ -653,11 +702,14 @@ LRESULT VLCHolderWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
         case WM_PAINT:{
             PAINTSTRUCT PaintStruct;
             HDC hDC = BeginPaint(hWnd(), &PaintStruct);
+            onPaint(hDC);
+#if 0
             RECT rect;
             GetClientRect(hWnd(), &rect);
             int IconX = ((rect.right - rect.left) - GetSystemMetrics(SM_CXICON))/2;
             int IconY = ((rect.bottom - rect.top) - GetSystemMetrics(SM_CYICON))/2;
             DrawIcon(hDC, IconX, IconY, RC().hBackgroundIcon);
+#endif
             EndPaint(hWnd(), &PaintStruct);
             break;
         }
@@ -684,6 +736,37 @@ LRESULT VLCHolderWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
                            new_client_width, (rect.bottom-rect.top), TRUE);
             }
             break;
+        case WM_LBUTTONDOWN:
+        {
+            // lbutton down start a line
+            int x = GET_X_LPARAM(lParam);
+            int y = GET_Y_LPARAM(lParam);
+            if (!mCurLine.IsStart()){
+                mCurLine.Start(x,y);
+            }
+            else{
+                // ignore this line
+                mCurLine.Reset();
+            }
+            break;
+        }
+        case WM_LBUTTONUP:
+        {
+            int x = GET_X_LPARAM(lParam);
+            int y = GET_Y_LPARAM(lParam);
+            if (mCurLine.IsStart()){
+                mCurLine.Stop(x,y);
+                mLines.push_back(new vaLine(mCurLine));
+            }
+            mCurLine.Reset();
+            InvalidateRect(hWnd(), NULL, FALSE);
+            break;
+        }
+        case WM_RBUTTONDOWN:
+        {
+            ClearAllLines();
+            break;
+        }
         case WM_MOUSEMOVE:
         case WM_LBUTTONDBLCLK:
             WM().OnMouseEvent(uMsg);
@@ -801,17 +884,71 @@ void VLCHolderWnd::OnLibVlcEvent(const libvlc_event_t* event)
         _CtrlsWnd->OnLibVlcEvent(event);
 }
 
+/**
+ * add by fanhongxuan@gmail.com begin
+ *
+ */
+
+static void *vlc_video_lock_callback(void *pData, void **p_pixels)
+{
+	VLCHolderWnd *pWnd = reinterpret_cast<VLCHolderWnd*>(pData);
+	if (NULL == pWnd){
+		*p_pixels = NULL;
+		return 0;
+	}
+	if (NULL == pWnd->mpBuffer){
+		pWnd->mpBuffer = new unsigned char[pWnd->mWidth * pWnd->mHeight * 4];
+	}
+	*p_pixels = pWnd->mpBuffer;
+	return 0;
+}
+
+static void vlc_video_unlock_callback(void *pData, void *picture, void *const *planes)
+{
+    // when a frame is decoded ok, will call this function
+	VLCHolderWnd *pWnd = reinterpret_cast<VLCHolderWnd *>(pData);
+	if (NULL != pWnd){
+		pWnd->mFrameCount++;
+        InvalidateRect(pWnd->hWnd(),NULL, FALSE);
+	}
+}
+
+static void vlc_video_display_callback(void *opaque, void *picture)
+{
+    // when a display is needed, will call this
+}
+
+/**
+ * add by fanhongxuan@gmail.com end
+ */
 void VLCHolderWnd::LibVlcAttach()
 {
+    // modified by fanhongxuan@gmail.com
+    #if 0
     if( VP() )
         libvlc_media_player_set_hwnd( VP()->get_mp(), hWnd() );
+    #endif
+	// todo:fanhongxuan@gmail.com
+	// read the mWidth and height from the current setting of the window.
+	RECT rect;
+	::GetWindowRect(hWnd(), &rect);
+	mWidth = rect.right - rect.left;
+	mHeight = rect.bottom - rect.top;
+    int pitch = mWidth * 4;
+    libvlc_video_set_format(VP()->get_mp(), "RGBA", mWidth, mHeight, pitch);
+    libvlc_video_set_callbacks(VP()->get_mp(), 
+        vlc_video_lock_callback, 
+        vlc_video_unlock_callback, 
+        vlc_video_display_callback, this);
 }
 
 void VLCHolderWnd::LibVlcDetach()
 {
+    //libvlc_video_set_callbacks(VP()->get_mp(),NULL,NULL,NULL, NULL);
+    #if 0
     if( VP() )
         libvlc_media_player_set_hwnd( VP()->get_mp(), 0);
-
+    #endif
     MouseHook(false);
 }
 

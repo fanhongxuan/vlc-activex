@@ -829,8 +829,8 @@ void VLCPlugin::onDraw(DVTARGETDEVICE * ptd, HDC hicTargetDev,
         if( isUserMode() )
         {
             /* VLC is in user mode, just draw background color */
-            COLORREF colorref = RGB(0, 0, 0);
-            OleTranslateColor(_i_backcolor, (HPALETTE)GetStockObject(DEFAULT_PALETTE), &colorref);
+            COLORREF colorref = RGB(255, 0, 0);
+            //OleTranslateColor(_i_backcolor, (HPALETTE)GetStockObject(DEFAULT_PALETTE), &colorref);
             if( colorref != RGB(0, 0, 0) )
             {
                 /* custom background */
@@ -848,7 +848,7 @@ void VLCPlugin::onDraw(DVTARGETDEVICE * ptd, HDC hicTargetDev,
         {
             /* VLC is in design mode, draw the VLC logo */
             FillRect(hdcDraw, &bounds, (HBRUSH)GetStockObject(WHITE_BRUSH));
-
+#if 0
             LPPICTURE pict = getPicture();
             if( NULL != pict )
             {
@@ -890,7 +890,7 @@ void VLCPlugin::onDraw(DVTARGETDEVICE * ptd, HDC hicTargetDev,
 
                 pict->Release();
             }
-
+#endif
             SelectObject(hdcDraw, GetStockObject(BLACK_BRUSH));
 
             MoveToEx(hdcDraw, bounds.left, bounds.top, NULL);
