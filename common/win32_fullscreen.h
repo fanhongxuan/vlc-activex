@@ -26,6 +26,7 @@
 
 #ifdef _WIN32
 #include <vector>
+#include <list>
 #include "win32_vlcwnd.h"
 #include "vlc_player_options.h"
 #include "vlc_player.h"
@@ -173,6 +174,51 @@ public:
     int endY;
 };
 
+class vaPoint{
+public:
+	vaPoint(){x = 0; y = 0;}
+	vaPoint(const vaPoint &other){x = other.x;y = other.y;}
+	vaPoint &operator=(const vaPoint &other){x = other.x; y = other.y;}
+	int x;
+	int y;
+	bool IsSameAs(const vaPoint &point)
+	{
+		int ret = (point.x - x) * (point.x - x) + (point.y - y) * (point.y - y);
+		if (ret <= 50){
+			return true;
+		}
+		return false;
+	}
+};
+
+class vaRect
+{
+public:
+	vaRect();
+	vaRect(const vaRect &other);
+	vaRect &operator=(const vaRect &other);
+	~vaRect();
+	void AddPoint(const vaPoint &point);
+	void DelLastPoint();
+	bool IsClosed();
+	bool IsOnCaption(int x, int y);
+	bool Reset();
+	void Draw(HDC dc);
+	bool SetRectRightBottom(int x, int y);
+	std::vector< vaPoint *> &PointList(){return mPointList;}
+	bool IsRect(){return mbRect;}
+	bool IsFinish(){return mbFinish;}
+	void SetFinish(bool bFinish){mbFinish = bFinish;}
+	void SetHwnd(HWND hWnd){mHwnd = hWnd;}
+	void UpdateCaptionRect();
+private:
+	bool mbRect;
+	bool mbFinish;
+	std::vector< vaPoint* > mPointList;
+	RECT mCaptionRect;
+	HWND mHwnd;
+};
+
 class VLCHolderWnd: public VLCWnd
 {
 public:
@@ -206,7 +252,9 @@ public:
 private:
     static LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
     vaLine mCurLine;
+	vaRect mCurRect;
     std::vector<vaLine *> mLines;
+	std::list<vaRect *> mRects;
     HWND FindMP_hWnd();
 
     HHOOK _hMouseHook;

@@ -20,8 +20,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
+#ifndef WIN32
 #include "config.h"
+#endif
+// modified by fanhongxuan@gmail.com
+#if defined(_MSC_VER)
+#define snprintf _snprintf
+#endif
 
 #include "plugin.h"
 

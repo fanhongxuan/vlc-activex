@@ -26,6 +26,11 @@
 #include "config.h"
 #endif
 
+// modified by fanhongxuan
+#if defined(_MSC_VER)
+#define strcasecmp _stricmp
+#endif
+
 struct posidx_s { const char *n; size_t i; };
 static const posidx_s posidx[] = {
     { "center",        0 },

@@ -634,6 +634,208 @@ void VLCHolderWnd::PreRegisterWindowClass(WNDCLASS* wc)
     wc->lpszClassName = TEXT("Web Plugin VLC Window Holder Class");
 }
 
+vaRect::vaRect()
+{
+	mbRect = false;
+	mbFinish = false;
+	memset(&mCaptionRect, 0, sizeof(mCaptionRect));
+	mHwnd = NULL;
+}
+
+vaRect::~vaRect()
+{
+	Reset();
+}
+
+vaRect::vaRect(const vaRect &other)
+{
+	int i = 0;
+	for (i = 0; i < other.mPointList.size(); i++){
+		AddPoint(*other.mPointList[i]);
+	}
+	mCaptionRect = other.mCaptionRect;
+	mbRect = other.mbRect;
+	mbFinish = other.mbFinish;
+	mHwnd = other.mHwnd;
+}
+
+bool vaRect::Reset()
+{
+	int i = 0;
+	for (i = 0; i < mPointList.size(); i++){
+		delete mPointList[i];
+	}
+	mPointList.clear();
+	memset(&mCaptionRect, 0, sizeof(mCaptionRect));
+	mbRect = false;
+	mbFinish = false;
+	mHwnd = NULL;
+	return true;
+}
+
+bool vaRect::IsOnCaption(int x, int y)
+{
+	if (!IsFinish()){
+		return false;
+	}
+	if (mPointList.size() < 3){
+		return false;
+	}
+	if (x >= mCaptionRect.left && x <= mCaptionRect.right &&
+		y >= mCaptionRect.top && y <= mCaptionRect.bottom){
+			return true;
+	}
+	return false;
+}
+
+bool vaRect::IsClosed()
+{
+	if (mPointList.size() < 3){
+		return false;
+	}
+	
+	vaPoint *pStart = mPointList[0];
+	vaPoint *pStop = mPointList[mPointList.size() - 1];
+	if (NULL != pStart && NULL != pStop){
+		if (pStart->IsSameAs(*pStop)){
+			// Update the mCaptionRect here
+			return true;
+		}
+	}
+	return false;
+}
+
+#define CAPTION_WIDTH 10
+#define CAPTION_HEIGHT 10
+void vaRect::AddPoint(const vaPoint &point)
+{
+	vaPoint *pPoint = new vaPoint(point);
+	mPointList.push_back(pPoint);
+}
+
+void vaRect::UpdateCaptionRect()
+{
+	RECT clientRect;
+	memset(&clientRect, 0, sizeof(clientRect));
+	GetClientRect(mHwnd, &clientRect);
+	mCaptionRect.left = mPointList[0]->x;
+	mCaptionRect.right =  mPointList[0]->x + CAPTION_WIDTH;
+	mCaptionRect.bottom = mPointList[0]->y;
+	mCaptionRect.top = mPointList[0]->y - CAPTION_HEIGHT;
+	if (mCaptionRect.top < clientRect.top){
+		mCaptionRect.top = clientRect.top;
+		mCaptionRect.bottom = clientRect.top + CAPTION_HEIGHT;
+	}
+	if (mCaptionRect.right > clientRect.right){
+		mCaptionRect.right = clientRect.right;
+		mCaptionRect.left = clientRect.right - CAPTION_WIDTH;
+	}
+}
+
+
+void vaRect::Draw(HDC dc)
+{
+	int j = 0;
+	if (mPointList.empty()){
+		return;
+	}
+	HPEN hPen = CreatePen(PS_SOLID, 2, RGB(255,0, 0));
+	HGDIOBJ  hOldPen = SelectObject(dc, hPen);
+	for (j = 0; j < mPointList.size(); j++){
+		vaPoint *pBegin  = mPointList[j];
+		vaPoint *pEnd    = NULL;
+		if ((j+1) < mPointList.size()){
+			pEnd = mPointList[j+1];
+		}
+		else if (mPointList.size() == 1){
+			pEnd = mPointList[0];
+		}
+		if (NULL != pBegin && NULL != pEnd){
+			MoveToEx(dc, pBegin->x, pBegin->y, NULL);
+			LineTo(dc, pEnd->x, pEnd->y);
+		}
+	}
+	if (IsFinish()){
+		// draw the close catpion
+		UpdateCaptionRect();
+
+		HPEN hCaption = CreatePen(PS_SOLID, 2, RGB(0, 255, 0));
+		SelectObject(dc, hCaption);
+		MoveToEx(dc, mCaptionRect.left, mCaptionRect.top, NULL);
+		LineTo(dc, mCaptionRect.right, mCaptionRect.bottom);
+		MoveToEx(dc, mCaptionRect.right, mCaptionRect.top, NULL);
+		LineTo(dc, mCaptionRect.left, mCaptionRect.bottom);
+		SelectObject(dc, hPen);
+		DeleteObject(hCaption);
+	}
+	HPEN hStartPointPen = CreatePen(PS_SOLID, 5, RGB(255, 0, 0));
+	SelectObject(dc, hStartPointPen);
+	MoveToEx(dc, mPointList[0]->x, mPointList[0]->y, NULL);
+	LineTo(dc, mPointList[0]->x, mPointList[0]->y);
+	SelectObject(dc, hOldPen);
+	DeleteObject(hStartPointPen);
+	DeleteObject(hPen);
+}
+
+void vaRect::DelLastPoint()
+{
+	if (IsFinish()){
+		return;
+	}
+
+	if (mPointList.empty()){
+		return;
+	}
+	if (mPointList.size() == 1){
+		Reset();
+	}
+	else{
+		delete mPointList[mPointList.size() - 1];
+		mPointList.resize(mPointList.size() - 1);
+	}
+}
+
+bool vaRect::SetRectRightBottom(int x, int y)
+{
+	if (mPointList.empty()){
+		return false;
+	}
+	if (mPointList.size() == 1 && mbRect == false){
+		// make sure the distance is enough
+		vaPoint cur = vaPoint();
+		cur.x = x; cur.y = y;
+		if (mPointList[0]->IsSameAs(cur)){
+			return false;
+		}
+		mbRect = true;
+		vaPoint  *pt= new vaPoint;
+		pt->x = mPointList[0]->x;
+		pt->y = y;
+		mPointList.push_back(pt); // left bottom
+		pt = new vaPoint;
+		pt->x = x;
+		pt->y = y;  
+		mPointList.push_back(pt); // right bottom
+		pt = new vaPoint;
+		pt->x = x;
+		pt->y = mPointList[0]->y;
+		mPointList.push_back(pt); // right top
+		pt = new vaPoint;
+		pt->x = mPointList[0]->x;
+		pt->y = mPointList[0]->y;
+		mPointList.push_back(pt);
+		return true;
+	}
+	else if (mPointList.size() == 5 && mbRect == true){
+		mPointList[1]->y = y; // left bottom
+		mPointList[2]->x = x;
+		mPointList[2]->y = y;
+		mPointList[3]->x = x;
+		return true;
+	}
+	return false;
+}
+
 void VLCHolderWnd::onPaint(HDC hDC)
 {
     HDC hMemory = CreateCompatibleDC(hDC);
@@ -656,6 +858,16 @@ void VLCHolderWnd::onPaint(HDC hDC)
     SelectObject(hMemory, hBitmap);
     SetDIBits(hMemory, hBitmap, 0, mHeight, mpBuffer, &info, DIB_RGB_COLORS);
 
+	std::list<vaRect*>::iterator it = mRects.begin();
+	while(it != mRects.end()){
+		vaRect *pRect = *it;
+		if (NULL != pRect){
+			pRect->Draw(hMemory);
+		}
+		it++;
+	}
+	mCurRect.Draw(hMemory);
+#if 0
     HPEN hPen = CreatePen(PS_SOLID, 5, RGB(255,0,0));
     SelectObject(hMemory, hPen);
     for (int i = 0; i < mLines.size(); i++){
@@ -664,7 +876,8 @@ void VLCHolderWnd::onPaint(HDC hDC)
             MoveToEx(hMemory, pLine->startX, pLine->startY, NULL);
             LineTo(hMemory, pLine->endX, pLine->endY);
         }
-    }    
+    }
+#endif
     BitBlt(hDC, 0, 0, mWidth, mHeight, hMemory, 0, 0, SRCCOPY);
 
     DeleteDC(hMemory);
@@ -738,9 +951,30 @@ LRESULT VLCHolderWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
             break;
         case WM_LBUTTONDOWN:
         {
-            // lbutton down start a line
+			// note:fanhongxuan@gmail.com
+			// left down, add a new point
+			bool isDelete = false;
             int x = GET_X_LPARAM(lParam);
             int y = GET_Y_LPARAM(lParam);
+			vaPoint pt;
+			pt.x = x;pt.y = y;
+			std::list<vaRect *>::iterator it = mRects.begin();
+			while(it != mRects.end()){
+				vaRect *pRect = *it;
+				if (NULL != pRect && pRect->IsOnCaption(x, y)){
+					// delete this
+					delete pRect;
+					mRects.erase(it);
+					isDelete = true;
+					break;
+				}
+				it++;
+			}
+			if (!isDelete){
+				mCurRect.AddPoint(pt);
+			}
+			InvalidateRect(hWnd(), NULL, FALSE);
+#if 0			
             if (!mCurLine.IsStart()){
                 mCurLine.Start(x,y);
             }
@@ -748,28 +982,66 @@ LRESULT VLCHolderWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
                 // ignore this line
                 mCurLine.Reset();
             }
+#endif
             break;
         }
         case WM_LBUTTONUP:
         {
             int x = GET_X_LPARAM(lParam);
             int y = GET_Y_LPARAM(lParam);
+			if (mCurRect.SetRectRightBottom(x, y)){
+				mCurRect.SetFinish(true);
+				mCurRect.SetHwnd(hWnd());
+				mRects.push_back(new vaRect(mCurRect));
+				mCurRect.Reset();
+				InvalidateRect(hWnd(), NULL, FALSE);
+			}
+#if 0
             if (mCurLine.IsStart()){
                 mCurLine.Stop(x,y);
                 mLines.push_back(new vaLine(mCurLine));
             }
             mCurLine.Reset();
             InvalidateRect(hWnd(), NULL, FALSE);
+#endif
+			
             break;
         }
         case WM_RBUTTONDOWN:
         {
+#if 0
             ClearAllLines();
+#endif
+			mCurRect.DelLastPoint();
+			InvalidateRect(hWnd(), NULL, TRUE);
             break;
         }
-        case WM_MOUSEMOVE:
         case WM_LBUTTONDBLCLK:
-            WM().OnMouseEvent(uMsg);
+			{
+				// note:fanhongxuan@gmail.com
+				// when left doble click, add the mCurRect to mRects.
+				if (mCurRect.IsClosed()){
+					mCurRect.SetFinish(true);
+					mCurRect.SetHwnd(hWnd());
+					mRects.push_back(new vaRect(mCurRect));
+					mCurRect.Reset();
+					InvalidateRect(hWnd(), NULL, FALSE);
+				}
+				// note:fanhongxuan@gmail.com
+				// 
+			}
+			break;
+        case WM_MOUSEMOVE:
+			{
+				if (wParam & MK_LBUTTON){
+					int x = GET_X_LPARAM(lParam);
+					int y = GET_Y_LPARAM(lParam);
+					if (mCurRect.SetRectRightBottom(x, y)){
+						InvalidateRect(hWnd(), NULL, TRUE);
+					}
+				}
+			}
+            // WM().OnMouseEvent(uMsg);
             break;
         case WM_MOUSE_EVENT_NOTIFY:{
             WM().OnMouseEvent(wParam);
