@@ -27,6 +27,7 @@
 #if defined(_MSC_VER)
 #define snprintf _snprintf
 #endif
+#include <time.h> // for time
 
 #include "plugin.h"
 
@@ -382,8 +383,15 @@ STDMETHODIMP VLCPlugin::QueryInterface(REFIID riid, void **ppv)
     return NOERROR;
 };
 
+std::map<VLCPlugin *, time_t> thePluginMap;
+
+
 STDMETHODIMP_(ULONG) VLCPlugin::AddRef(void)
 {
+    std::map<VLCPlugin *, time_t>::iterator it = thePluginMap.find(this);
+    if (it == thePluginMap.end()){
+        thePluginMap.insert(std::make_pair(this, time(NULL)));
+    }
     return InterlockedIncrement((LONG *)&_i_ref);
 };
 
@@ -391,11 +399,36 @@ STDMETHODIMP_(ULONG) VLCPlugin::Release(void)
 {
     if( ! InterlockedDecrement((LONG *)&_i_ref) )
     {
+        std::map<VLCPlugin *, time_t>::iterator it = thePluginMap.find(this);
+        if (it != thePluginMap.end()){
+            thePluginMap.erase(it);
+        }
         delete this;
         return 0;
     }
     return _i_ref;
 };
+
+vlc_player& VLCPlugin::get_player()
+{
+    time_t ourTime = thePluginMap[this];
+    std::map<VLCPlugin *, time_t>::iterator it = thePluginMap.begin();
+    while(it != thePluginMap.end()){
+        time_t distance = ourTime - it->second;
+        if (distance <= 1 && distance >= -1 && it->second != 0 && it->first != this){ 
+            return *static_cast<vlc_player*>(it->first);
+        }
+        it++;
+    }
+    if( !vlc_player::is_open() ) initVLC();
+    return *static_cast<vlc_player*>(this);
+}
+/*
+{
+    if( !vlc_player::is_open() ) initVLC();
+    return *static_cast<vlc_player*>(this);
+}*/
+
 
 //////////////////////////////////////
 
@@ -1248,6 +1281,18 @@ static void handle_length_changed_event(const libvlc_event_t* event, void *param
 
 void VLCPlugin::set_player_window()
 {
+    time_t ourTime = thePluginMap[this];
+    std::map<VLCPlugin *, time_t>::iterator it = thePluginMap.begin();
+    while(it != thePluginMap.end()){
+        time_t distance = ourTime - it->second;
+        if (distance <= 1 && distance >= -1 && it->second != 0 &&it->first != this){ 
+            //it->first->set_player_window();
+			it->first->_WindowsManager.LibVlcAttach(&get_player());
+            return;
+            //return *static_cast<vlc_player*>(it->first);
+        }
+        it++;
+    }
     _WindowsManager.LibVlcAttach( &get_player() );
 }
 

@@ -230,10 +230,12 @@ public:
 protected:
     VLCHolderWnd(HINSTANCE hInstance, VLCWindowsManager* WM)
         : VLCWnd(hInstance), _hMouseHook(NULL), _MouseHookThreadId(0),
-         _wm(WM), _hBgBrush(0), _CtrlsWnd(0) {};
+		_wm(WM), _hBgBrush(0), _CtrlsWnd(0), mbMsgServerStarted(false) {};
     bool Create(HWND hWndParent);
     void onPaint(HDC hDC);
     void ClearAllLines();
+	void StartMsgServer();
+	void StopMsgServer();
     virtual void PreRegisterWindowClass(WNDCLASS* wc);
     virtual LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -253,6 +255,7 @@ private:
     static LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
     vaLine mCurLine;
 	vaRect mCurRect;
+	bool mbMsgServerStarted;
     std::vector<vaLine *> mLines;
 	std::list<vaRect *> mRects;
     HWND FindMP_hWnd();

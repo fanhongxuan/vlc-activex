@@ -97,11 +97,12 @@ public:
     REFCLSID getClassID(void) { return _p_class->getClassID(); };
     REFIID getDispEventID(void) { return (REFIID)DIID_DVLCEvents; };
 
-    vlc_player& get_player()
+    vlc_player& get_player();
+    /*
     {
         if( !vlc_player::is_open() ) initVLC();
         return *static_cast<vlc_player*>(this);
-    }
+    }*/
 
     vlc_player_options& get_options()
         { return *static_cast<vlc_player_options*>(this); }

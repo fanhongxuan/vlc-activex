@@ -183,6 +183,9 @@ bool vlc_player::play(unsigned int idx)
     if( !is_open() )
         return false;
 
+	if( 0 == items_count() )
+        return false;
+
     const int r = libvlc_media_list_player_play_item_at_index(_ml_p, idx);
     if( 0 == r ) {
         on_player_action(pa_play);

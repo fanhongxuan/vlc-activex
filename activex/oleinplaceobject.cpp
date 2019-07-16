@@ -56,7 +56,7 @@ STDMETHODIMP VLCOleInPlaceObject::InPlaceDeactivate(void)
         if( SUCCEEDED(QueryInterface(IID_IOleObject, (void**)&p_oleObject)) )
         {
             LPOLECLIENTSITE p_clientSite;
-            if( SUCCEEDED(p_oleObject->GetClientSite(&p_clientSite)) )
+            if( SUCCEEDED(p_oleObject->GetClientSite(&p_clientSite)) && NULL != p_clientSite)
             {
                 LPOLEINPLACESITE p_inPlaceSite;
 
@@ -85,7 +85,7 @@ STDMETHODIMP VLCOleInPlaceObject::UIDeactivate(void)
         if( SUCCEEDED(QueryInterface(IID_IOleObject, (void**)&p_oleObject)) )
         {
             LPOLECLIENTSITE p_clientSite;
-            if( SUCCEEDED(p_oleObject->GetClientSite(&p_clientSite)) )
+            if( SUCCEEDED(p_oleObject->GetClientSite(&p_clientSite)) && NULL != p_clientSite )
             {
                 LPOLEINPLACESITE p_inPlaceSite;
 

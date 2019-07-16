@@ -30,7 +30,8 @@
 #include <uxtheme.h>
 #include <windowsx.h>
 #include "win32_fullscreen.h"
-
+#include "msg.h"
+#include "msgserver.h"
 ////////////////////////////////////////////////////////////////////////////////
 //VLCControlsWnd members
 ////////////////////////////////////////////////////////////////////////////////
@@ -755,6 +756,11 @@ void vaRect::Draw(HDC dc)
 			LineTo(dc, pEnd->x, pEnd->y);
 		}
 	}
+	HPEN hStartPointPen = CreatePen(PS_SOLID, 5, RGB(255, 0, 0));
+	SelectObject(dc, hStartPointPen);
+	MoveToEx(dc, mPointList[0]->x, mPointList[0]->y, NULL);
+	LineTo(dc, mPointList[0]->x, mPointList[0]->y);
+
 	if (IsFinish()){
 		// draw the close catpion
 		UpdateCaptionRect();
@@ -768,11 +774,9 @@ void vaRect::Draw(HDC dc)
 		SelectObject(dc, hPen);
 		DeleteObject(hCaption);
 	}
-	HPEN hStartPointPen = CreatePen(PS_SOLID, 5, RGB(255, 0, 0));
-	SelectObject(dc, hStartPointPen);
-	MoveToEx(dc, mPointList[0]->x, mPointList[0]->y, NULL);
-	LineTo(dc, mPointList[0]->x, mPointList[0]->y);
+
 	SelectObject(dc, hOldPen);
+
 	DeleteObject(hStartPointPen);
 	DeleteObject(hPen);
 }
@@ -836,12 +840,37 @@ bool vaRect::SetRectRightBottom(int x, int y)
 	return false;
 }
 
+static u32 HandleMetadataReq(void *pBuffer)
+{
+	printf("HandleMetadataReq\n");
+	return 0;
+}
+
+void VLCHolderWnd::StartMsgServer()
+{
+	if (mbMsgServerStarted){
+		return;
+	}
+	
+	msg_setcfg(MSG_SERVERIP, "192.168.43.2");
+	msg_setcfg(MSG_PORT, "8002");
+	if (msg_register(ctrl_metadata_req, HandleMetadataReq) == 0){
+		mbMsgServerStarted = true;
+	}
+}
+
+void VLCHolderWnd::StopMsgServer()
+{
+
+}
+
 void VLCHolderWnd::onPaint(HDC hDC)
 {
     HDC hMemory = CreateCompatibleDC(hDC);
     if (NULL == hMemory){
         return;
     }
+	StartMsgServer();
     BITMAPINFO info;
     info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     info.bmiHeader.biWidth = mWidth;
@@ -954,6 +983,11 @@ LRESULT VLCHolderWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// note:fanhongxuan@gmail.com
 			// left down, add a new point
 			bool isDelete = false;
+			libvlc_state_t state = libvlc_NothingSpecial;
+			if (NULL != VP()){state = VP()->get_state();}
+			if (state != libvlc_Playing || state != libvlc_Paused){
+				break;
+			}
             int x = GET_X_LPARAM(lParam);
             int y = GET_Y_LPARAM(lParam);
 			vaPoint pt;
@@ -990,11 +1024,16 @@ LRESULT VLCHolderWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
             int x = GET_X_LPARAM(lParam);
             int y = GET_Y_LPARAM(lParam);
 			if (mCurRect.SetRectRightBottom(x, y)){
+				libvlc_state_t state = libvlc_NothingSpecial;
+			    if (NULL != VP()){state = VP()->get_state();}
+				if (state != libvlc_Playing || state != libvlc_Paused){
+					break;
+				}
 				mCurRect.SetFinish(true);
 				mCurRect.SetHwnd(hWnd());
 				mRects.push_back(new vaRect(mCurRect));
 				mCurRect.Reset();
-				InvalidateRect(hWnd(), NULL, FALSE);
+                InvalidateRect(hWnd(), NULL, FALSE);
 			}
 #if 0
             if (mCurLine.IsStart()){
@@ -1012,6 +1051,11 @@ LRESULT VLCHolderWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 #if 0
             ClearAllLines();
 #endif
+			libvlc_state_t state = libvlc_NothingSpecial;
+			if (NULL != VP()){state = VP()->get_state();}
+			if (state != libvlc_Playing || state != libvlc_Paused){
+				break;
+			}
 			mCurRect.DelLastPoint();
 			InvalidateRect(hWnd(), NULL, TRUE);
             break;
@@ -1020,13 +1064,18 @@ LRESULT VLCHolderWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			{
 				// note:fanhongxuan@gmail.com
 				// when left doble click, add the mCurRect to mRects.
+				libvlc_state_t state = libvlc_NothingSpecial;
+			    if (NULL != VP()){state = VP()->get_state();}
+				if (state != libvlc_Playing || state != libvlc_Paused){
+					break;
+				}
 				if (mCurRect.IsClosed()){
 					mCurRect.SetFinish(true);
 					mCurRect.SetHwnd(hWnd());
 					mRects.push_back(new vaRect(mCurRect));
 					mCurRect.Reset();
-					InvalidateRect(hWnd(), NULL, FALSE);
 				}
+				InvalidateRect(hWnd(), NULL, FALSE);
 				// note:fanhongxuan@gmail.com
 				// 
 			}
@@ -1036,8 +1085,13 @@ LRESULT VLCHolderWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				if (wParam & MK_LBUTTON){
 					int x = GET_X_LPARAM(lParam);
 					int y = GET_Y_LPARAM(lParam);
+					libvlc_state_t state = libvlc_NothingSpecial;
+			        if (NULL != VP()){state = VP()->get_state();}
+					if (state != libvlc_Playing || state != libvlc_Paused){
+						break;
+					}
 					if (mCurRect.SetRectRightBottom(x, y)){
-						InvalidateRect(hWnd(), NULL, TRUE);
+						InvalidateRect(hWnd(), NULL, FALSE);
 					}
 				}
 			}
@@ -1207,6 +1261,10 @@ void VLCHolderWnd::LibVlcAttach()
 	mWidth = rect.right - rect.left;
 	mHeight = rect.bottom - rect.top;
     int pitch = mWidth * 4;
+	libvlc_media_player_t *pVp = VP()->get_mp();
+	if (NULL == pVp){
+		return;
+	}
     libvlc_video_set_format(VP()->get_mp(), "RGBA", mWidth, mHeight, pitch);
     libvlc_video_set_callbacks(VP()->get_mp(), 
         vlc_video_lock_callback, 
@@ -1216,7 +1274,9 @@ void VLCHolderWnd::LibVlcAttach()
 
 void VLCHolderWnd::LibVlcDetach()
 {
-    //libvlc_video_set_callbacks(VP()->get_mp(),NULL,NULL,NULL, NULL);
+    if (NULL != VP() && NULL != VP()->get_mp()){
+        libvlc_video_set_callbacks(VP()->get_mp(),NULL,NULL,NULL, NULL);
+    }
     #if 0
     if( VP() )
         libvlc_media_player_set_hwnd( VP()->get_mp(), 0);

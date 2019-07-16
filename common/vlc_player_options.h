@@ -63,7 +63,7 @@ class vlc_player_options
 {
 public:
     vlc_player_options()
-        :_autoplay(true), _show_toolbar(true), _enable_fullscreen(true), _enable_branding(false),
+        :_autoplay(false), _show_toolbar(true), _enable_fullscreen(true), _enable_branding(false),
         _bg_color(/*black*/"#000000")
    {}
 
