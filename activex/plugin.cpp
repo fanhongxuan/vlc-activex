@@ -503,6 +503,7 @@ void VLCPlugin::initVLC()
         "-vv",
         "--no-stats",
         "--intf=dummy",
+        "--network-caching=200",
         "--no-video-title-show",
     };
 
