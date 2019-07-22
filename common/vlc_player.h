@@ -44,6 +44,7 @@ public:
     bool is_open() const { return _ml_p != 0; }
     bool is_playing();
     libvlc_state_t get_state();
+    const char *get_mrl();
     bool is_stopped() { return libvlc_Stopped == get_state(); }
 
     int add_item(const char * mrl, unsigned int optc, const char **optv);

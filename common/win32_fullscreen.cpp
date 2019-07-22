@@ -30,8 +30,9 @@
 #include <uxtheme.h>
 #include <windowsx.h>
 #include "win32_fullscreen.h"
+#include <time.h> // for time
 #include "msg.h"
-#include "msgserver.h"
+#include "metadata.h"
 ////////////////////////////////////////////////////////////////////////////////
 //VLCControlsWnd members
 ////////////////////////////////////////////////////////////////////////////////
@@ -614,6 +615,7 @@ VLCHolderWnd::~VLCHolderWnd()
         DeleteObject(_hBgBrush);
         _hBgBrush = 0;
     }
+	StopMsgServer();
 }
 
 bool VLCHolderWnd::Create(HWND hWndParent)
@@ -637,6 +639,8 @@ void VLCHolderWnd::PreRegisterWindowClass(WNDCLASS* wc)
 
 vaRect::vaRect()
 {
+	mTTL = -1;
+	mTimeStamp = 0;
 	mbRect = false;
 	mbFinish = false;
 	memset(&mCaptionRect, 0, sizeof(mCaptionRect));
@@ -658,6 +662,8 @@ vaRect::vaRect(const vaRect &other)
 	mbRect = other.mbRect;
 	mbFinish = other.mbFinish;
 	mHwnd = other.mHwnd;
+	mTTL = other.mTTL;
+	mTimeStamp = other.mTimeStamp;
 }
 
 bool vaRect::Reset()
@@ -670,6 +676,8 @@ bool vaRect::Reset()
 	memset(&mCaptionRect, 0, sizeof(mCaptionRect));
 	mbRect = false;
 	mbFinish = false;
+	mTimeStamp = 0;
+	mTTL = -1;
 	mHwnd = NULL;
 	return true;
 }
@@ -840,28 +848,95 @@ bool vaRect::SetRectRightBottom(int x, int y)
 	return false;
 }
 
-static u32 HandleMetadataReq(void *pBuffer)
+static VLCHolderWnd *theHolderWnd = NULL;
+static u32 msg_handleMetadataReq(void *pBuffer)
 {
-	printf("HandleMetadataReq\n");
+	if (NULL != theHolderWnd){
+		return theHolderWnd->HandleMetadataReq(pBuffer);
+	}
 	return 0;
 }
 
-void VLCHolderWnd::StartMsgServer()
+unsigned int VLCHolderWnd::HandleMetadataReq(void *pBuffer){
+	ctrl_metadata_req_t *pReq = (ctrl_metadata_req_t *)pBuffer;
+	if (pReq->Type == ctrl_metadata_add_obj){
+		if (pReq->Data.AddObj.Obj.Type == ctrl_metadata_object_type_text){
+		}
+		else if (pReq->Data.AddObj.Obj.Type == ctrl_metadata_object_type_rect){
+			vaRect *pRect = new vaRect();
+			vaPoint start;
+			start.x = pReq->Data.AddObj.Obj.Data.Rect.TopLeft.X;
+			start.y = pReq->Data.AddObj.Obj.Data.Rect.TopLeft.Y;
+			pRect->AddPoint(start);
+			pRect->SetRectRightBottom(pReq->Data.AddObj.Obj.Data.Rect.BottomRight.X, pReq->Data.AddObj.Obj.Data.Rect.BottomRight.Y);
+			pRect->SetFinish(true);
+			pRect->SetHwnd(hWnd());
+			pRect->SetTTL(pReq->Data.AddObj.Obj.TTL);
+			if (pReq->Data.AddObj.Obj.Timestamp != 0){
+				pRect->SetTimeStamp(pReq->Data.AddObj.Obj.Timestamp);
+			}
+			else{
+				pRect->SetTimeStamp((int)time(NULL));
+			}
+			mRects.push_back(pRect);
+		}
+		else if (pReq->Data.AddObj.Obj.Type == ctrl_metadata_object_type_comp){
+		}
+		else if (pReq->Data.AddObj.Obj.Type == ctrl_metadata_object_type_cycle){
+		}
+		else{
+			// unknown type
+		}
+	}
+	else if (pReq->Type == ctrl_metadata_del_obj){
+
+	}
+	InvalidateRect(hWnd(), NULL, false);
+	return 0;
+}
+
+void VLCHolderWnd::StartMsgServer(const char *pMrl)
 {
 	if (mbMsgServerStarted){
 		return;
 	}
-	
-	msg_setcfg(MSG_SERVERIP, "192.168.43.2");
-	msg_setcfg(MSG_PORT, "8002");
-	if (msg_register(ctrl_metadata_req, HandleMetadataReq) == 0){
+    if (NULL == pMrl){
+        return;
+    }
+    char buff[1024] = {0};
+    strcpy(buff, pMrl);
+	const char *pServerPort = "8002";
+    char *pServerIp = strstr(buff, "rtsp://");
+    if (NULL != pServerIp){
+        pServerIp += strlen("rtsp://");
+    }
+    int i = 0;
+    for(i = strlen("rtsp://"); i < 1024;i++){
+        if (buff[i] == '/'){
+            buff[i] = 0;
+            break;
+        }
+    }
+	if (strcmp(pMrl, "rtsp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov") == 0){
+		pServerIp = "192.168.43.2";
+	}
+	msg_setcfg(MSG_SERVERIP, pServerIp);
+	msg_setcfg(MSG_PORT, pServerPort);
+	msg_register_serial(ctrl_metadata_req, metadata_h2n, metadata_n2h);
+	if (msg_register(ctrl_metadata_req, msg_handleMetadataReq) == 0){
 		mbMsgServerStarted = true;
+		if (theHolderWnd != this){
+			theHolderWnd = this;
+		}
 	}
 }
 
 void VLCHolderWnd::StopMsgServer()
 {
-
+	if (theHolderWnd == this){
+		theHolderWnd = NULL;
+	}
+	msg_unregister(ctrl_metadata_req);
 }
 
 void VLCHolderWnd::onPaint(HDC hDC)
@@ -870,7 +945,9 @@ void VLCHolderWnd::onPaint(HDC hDC)
     if (NULL == hMemory){
         return;
     }
-	StartMsgServer();
+    if (VP() != NULL && VP()->is_playing()){
+	    StartMsgServer(VP()->get_mrl());
+    }
     BITMAPINFO info;
     info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     info.bmiHeader.biWidth = mWidth;
@@ -891,6 +968,17 @@ void VLCHolderWnd::onPaint(HDC hDC)
 	while(it != mRects.end()){
 		vaRect *pRect = *it;
 		if (NULL != pRect){
+			// check the timestamp and ttl
+			if (pRect->GetTimeStamp() != 0 && pRect->GetTTL() != 0){
+				int now = (int)time(NULL);
+				int timeout = pRect->GetTimeStamp() + pRect->GetTTL();
+				if (now >= timeout){
+					std::list<vaRect*>::iterator del = it;
+					it++;
+					mRects.erase(del);
+					continue;
+				}
+			}
 			pRect->Draw(hMemory);
 		}
 		it++;
@@ -985,7 +1073,7 @@ LRESULT VLCHolderWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			bool isDelete = false;
 			libvlc_state_t state = libvlc_NothingSpecial;
 			if (NULL != VP()){state = VP()->get_state();}
-			if (state != libvlc_Playing || state != libvlc_Paused){
+			if (state != libvlc_Playing && state != libvlc_Paused){
 				break;
 			}
             int x = GET_X_LPARAM(lParam);
@@ -1026,7 +1114,7 @@ LRESULT VLCHolderWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (mCurRect.SetRectRightBottom(x, y)){
 				libvlc_state_t state = libvlc_NothingSpecial;
 			    if (NULL != VP()){state = VP()->get_state();}
-				if (state != libvlc_Playing || state != libvlc_Paused){
+				if (state != libvlc_Playing && state != libvlc_Paused){
 					break;
 				}
 				mCurRect.SetFinish(true);
@@ -1053,7 +1141,7 @@ LRESULT VLCHolderWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 #endif
 			libvlc_state_t state = libvlc_NothingSpecial;
 			if (NULL != VP()){state = VP()->get_state();}
-			if (state != libvlc_Playing || state != libvlc_Paused){
+			if (state != libvlc_Playing && state != libvlc_Paused){
 				break;
 			}
 			mCurRect.DelLastPoint();
@@ -1066,7 +1154,7 @@ LRESULT VLCHolderWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				// when left doble click, add the mCurRect to mRects.
 				libvlc_state_t state = libvlc_NothingSpecial;
 			    if (NULL != VP()){state = VP()->get_state();}
-				if (state != libvlc_Playing || state != libvlc_Paused){
+				if (state != libvlc_Playing && state != libvlc_Paused){
 					break;
 				}
 				if (mCurRect.IsClosed()){
@@ -1087,7 +1175,7 @@ LRESULT VLCHolderWnd::WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 					int y = GET_Y_LPARAM(lParam);
 					libvlc_state_t state = libvlc_NothingSpecial;
 			        if (NULL != VP()){state = VP()->get_state();}
-					if (state != libvlc_Playing || state != libvlc_Paused){
+					if (state != libvlc_Playing && state != libvlc_Paused){
 						break;
 					}
 					if (mCurRect.SetRectRightBottom(x, y)){

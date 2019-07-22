@@ -211,9 +211,15 @@ public:
 	void SetFinish(bool bFinish){mbFinish = bFinish;}
 	void SetHwnd(HWND hWnd){mHwnd = hWnd;}
 	void UpdateCaptionRect();
+	int GetTTL()const{return mTTL;}
+	void SetTTL(int ttl){mTTL = ttl;}
+	int GetTimeStamp() const{return mTimeStamp;}
+	void SetTimeStamp(int timeStamp){mTimeStamp = timeStamp;}
 private:
 	bool mbRect;
 	bool mbFinish;
+	int mTTL;
+	int mTimeStamp;
 	std::vector< vaPoint* > mPointList;
 	RECT mCaptionRect;
 	HWND mHwnd;
@@ -225,6 +231,7 @@ public:
     static VLCHolderWnd*
         CreateHolderWindow(HINSTANCE hInstance,
                            HWND hParentWnd, VLCWindowsManager* WM);
+	unsigned int HandleMetadataReq(void *pBuffer);
     ~VLCHolderWnd();
 
 protected:
@@ -234,7 +241,7 @@ protected:
     bool Create(HWND hWndParent);
     void onPaint(HDC hDC);
     void ClearAllLines();
-	void StartMsgServer();
+	void StartMsgServer(const char *pMrl);
 	void StopMsgServer();
     virtual void PreRegisterWindowClass(WNDCLASS* wc);
     virtual LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);

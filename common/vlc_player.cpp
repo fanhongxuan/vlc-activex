@@ -90,6 +90,19 @@ void vlc_player::close()
     _libvlc_instance = 0;
 }
 
+const char *vlc_player::get_mrl()
+{
+    int index = current_item();
+    if (index < 0){
+        return NULL;
+    }
+    libvlc_media_t *pMedia = libvlc_media_list_item_at_index(_ml, index);
+    if (NULL != pMedia){
+        return libvlc_media_get_mrl(pMedia);
+    }
+    return NULL;
+}
+
 int vlc_player::add_item(const char * mrl, unsigned int optc, const char **optv)
 {
     if( !is_open() )
