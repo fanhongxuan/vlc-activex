@@ -1,0 +1,11 @@
+*.obj
+*.tlog
+*.log
+*~
+activex/axvlc.tlb
+activex/axvlc_idl.c
+activex/axvlc_idl.h
+build/vc2008/ActiveX/Debug/*
+build/vc2008/ActiveX/Release/*
+build/vc2008/Debug/*
+build/vc2008/Release/*
