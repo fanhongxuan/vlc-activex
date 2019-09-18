@@ -895,32 +895,21 @@ unsigned int VLCHolderWnd::HandleMetadataReq(void *pBuffer){
 	return 0;
 }
 
-void VLCHolderWnd::StartMsgServer(const char *pMrl)
+void VLCHolderWnd::StartMsgServer()
 {
 	if (mbMsgServerStarted){
 		return;
 	}
-    if (NULL == pMrl){
+    if (VP() == NULL){
         return;
     }
-    char buff[1024] = {0};
-    strcpy(buff, pMrl);
-	const char *pServerPort = "8002";
-    char *pServerIp = strstr(buff, "rtsp://");
-    if (NULL != pServerIp){
-        pServerIp += strlen("rtsp://");
+    const char *pServerIp = VP()->get_msgq_addr();
+    const char *pServerPort = VP()->get_msgq_port();
+    if (NULL == pServerIp || NULL == pServerPort){
+        return;
     }
-    int i = 0;
-    for(i = strlen("rtsp://"); i < 1024;i++){
-        if (buff[i] == '/'){
-            buff[i] = 0;
-            break;
-        }
-    }
-	if (strcmp(pMrl, "rtsp://184.72.239.149/vod/mp4://BigBuckBunny_175k.mov") == 0){
-		pServerIp = "192.168.43.2";
-	}
-	msg_setcfg(MSG_SERVERIP, pServerIp);
+    
+    msg_setcfg(MSG_SERVERIP, pServerIp);
 	msg_setcfg(MSG_PORT, pServerPort);
 	msg_register_serial(ctrl_metadata_req, metadata_h2n, metadata_n2h);
 	if (msg_register(ctrl_metadata_req, msg_handleMetadataReq) == 0){
@@ -945,9 +934,7 @@ void VLCHolderWnd::onPaint(HDC hDC)
     if (NULL == hMemory){
         return;
     }
-    if (VP() != NULL && VP()->is_playing()){
-	    StartMsgServer(VP()->get_mrl());
-    }
+    StartMsgServer();
     BITMAPINFO info;
     info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     info.bmiHeader.biWidth = mWidth;

@@ -241,7 +241,7 @@ protected:
     bool Create(HWND hWndParent);
     void onPaint(HDC hDC);
     void ClearAllLines();
-	void StartMsgServer(const char *pMrl);
+	void StartMsgServer();
 	void StopMsgServer();
     virtual void PreRegisterWindowClass(WNDCLASS* wc);
     virtual LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);

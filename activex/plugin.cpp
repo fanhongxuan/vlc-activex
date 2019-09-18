@@ -383,15 +383,18 @@ STDMETHODIMP VLCPlugin::QueryInterface(REFIID riid, void **ppv)
     return NOERROR;
 };
 
+#ifdef WORKAROUND_OF_VUE
 std::map<VLCPlugin *, time_t> thePluginMap;
-
+#endif
 
 STDMETHODIMP_(ULONG) VLCPlugin::AddRef(void)
 {
+#ifdef WORKAROUND_OF_VUE    
     std::map<VLCPlugin *, time_t>::iterator it = thePluginMap.find(this);
     if (it == thePluginMap.end()){
         thePluginMap.insert(std::make_pair(this, time(NULL)));
     }
+#endif    
     return InterlockedIncrement((LONG *)&_i_ref);
 };
 
@@ -399,10 +402,12 @@ STDMETHODIMP_(ULONG) VLCPlugin::Release(void)
 {
     if( ! InterlockedDecrement((LONG *)&_i_ref) )
     {
+#ifdef WORKAROUND_OF_VUE        
         std::map<VLCPlugin *, time_t>::iterator it = thePluginMap.find(this);
         if (it != thePluginMap.end()){
             thePluginMap.erase(it);
         }
+#endif        
         delete this;
         return 0;
     }
@@ -411,6 +416,7 @@ STDMETHODIMP_(ULONG) VLCPlugin::Release(void)
 
 vlc_player& VLCPlugin::get_player()
 {
+#ifdef WORKAROUND_OF_VUE    
     time_t ourTime = thePluginMap[this];
     std::map<VLCPlugin *, time_t>::iterator it = thePluginMap.begin();
     while(it != thePluginMap.end()){
@@ -420,6 +426,7 @@ vlc_player& VLCPlugin::get_player()
         }
         it++;
     }
+#endif    
     if( !vlc_player::is_open() ) initVLC();
     return *static_cast<vlc_player*>(this);
 }
@@ -1282,6 +1289,7 @@ static void handle_length_changed_event(const libvlc_event_t* event, void *param
 
 void VLCPlugin::set_player_window()
 {
+#ifdef WORKAROUND_OF_VUE    
     time_t ourTime = thePluginMap[this];
     std::map<VLCPlugin *, time_t>::iterator it = thePluginMap.begin();
     while(it != thePluginMap.end()){
@@ -1294,6 +1302,7 @@ void VLCPlugin::set_player_window()
         }
         it++;
     }
+#endif    
     _WindowsManager.LibVlcAttach( &get_player() );
 }
 

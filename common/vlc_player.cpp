@@ -20,14 +20,24 @@
  *****************************************************************************/
 
 #include "vlc_player.h"
+#include <stdlib.h>
+#include <string.h>
 
 vlc_player::vlc_player()
     :_libvlc_instance(0), _mp(0), _ml(0), _ml_p(0)
 {
+    mpMsgqAddr = NULL;
+    mpMsgqPort = NULL;
 }
 
 vlc_player::~vlc_player(void)
 {
+    if (NULL != mpMsgqAddr){
+        free(mpMsgqAddr);
+    }
+    if (NULL != mpMsgqPort){
+        free(mpMsgqPort);
+    }
     close();
 }
 
@@ -90,6 +100,15 @@ void vlc_player::close()
     _libvlc_instance = 0;
 }
 
+const char *vlc_player::get_msgq_addr()
+{
+    return mpMsgqAddr;
+}
+
+const char *vlc_player::get_msgq_port(){
+    return mpMsgqPort;
+}
+
 const char *vlc_player::get_mrl()
 {
     int index = current_item();
@@ -109,7 +128,33 @@ int vlc_player::add_item(const char * mrl, unsigned int optc, const char **optv)
         return -1;
 
     int item = -1;
-
+	/**
+	 * add by fanhongxuan@gmail.com
+	 */
+    if (NULL != mrl && strstr(mrl, "msgq://") == mrl){
+        char buff[1024] = {0};
+        strcpy(buff, mrl);
+        int i = 0;
+        for(i = strlen("msgq://"); i < 1024;i++){
+            if (buff[i] == '/'){
+                buff[i] = 0;
+                break;
+            }
+        }
+        // msgq://xxxx:port
+        // msgq://ip
+        char *pServer = buff + strlen("msgq://");
+        char *pPort = strstr(pServer, ":");
+        if (NULL == pPort){
+            mpMsgqPort = strdup("8002");
+        }
+        else{
+            mpMsgqPort = strdup(pPort+1);
+            pServer[pPort-pServer] = 0;
+        }
+        mpMsgqAddr = strdup(pServer);
+        mrl = buff+i+1;
+    }
     libvlc_media_t* media = libvlc_media_new_location(_libvlc_instance, mrl);
     if( !media )
         return -1;

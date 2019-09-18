@@ -44,6 +44,8 @@ public:
     bool is_open() const { return _ml_p != 0; }
     bool is_playing();
     libvlc_state_t get_state();
+    const char *get_msgq_addr();
+    const char *get_msgq_port();
     const char *get_mrl();
     bool is_stopped() { return libvlc_Stopped == get_state(); }
 
@@ -103,6 +105,8 @@ protected:
     virtual void on_player_action( vlc_player_action_e ){};
 
 private:
+    char *mpMsgqAddr;
+    char *mpMsgqPort;
     libvlc_instance_t *         _libvlc_instance;
     libvlc_media_player_t*      _mp;
     libvlc_media_list_t*        _ml;
