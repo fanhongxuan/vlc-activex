@@ -908,7 +908,9 @@ void VLCHolderWnd::StartMsgServer()
     if (NULL == pServerIp || NULL == pServerPort){
         return;
     }
-    
+    if (strlen(pServerIp) == 0 && strlen(pServerPort) == 0){
+		return;
+	}
     msg_setcfg(MSG_SERVERIP, pServerIp);
 	msg_setcfg(MSG_PORT, pServerPort);
 	msg_register_serial(ctrl_metadata_req, metadata_h2n, metadata_n2h);
@@ -1307,16 +1309,21 @@ static void *vlc_video_lock_callback(void *pData, void **p_pixels)
 static void vlc_video_unlock_callback(void *pData, void *picture, void *const *planes)
 {
     // when a frame is decoded ok, will call this function
+	/*VLCHolderWnd *pWnd = reinterpret_cast<VLCHolderWnd *>(pData);
+	if (NULL != pWnd){
+		pWnd->mFrameCount++;
+        InvalidateRect(pWnd->hWnd(),NULL, TRUE);
+	}*/
+}
+
+static void vlc_video_display_callback(void *pData, void *picture)
+{
+    // when a display is needed, will call this
 	VLCHolderWnd *pWnd = reinterpret_cast<VLCHolderWnd *>(pData);
 	if (NULL != pWnd){
 		pWnd->mFrameCount++;
-        InvalidateRect(pWnd->hWnd(),NULL, FALSE);
+        InvalidateRect(pWnd->hWnd(),NULL, TRUE);
 	}
-}
-
-static void vlc_video_display_callback(void *opaque, void *picture)
-{
-    // when a display is needed, will call this
 }
 
 /**

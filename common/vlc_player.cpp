@@ -146,7 +146,7 @@ int vlc_player::add_item(const char * mrl, unsigned int optc, const char **optv)
         char *pServer = buff + strlen("msgq://");
         char *pPort = strstr(pServer, ":");
         if (NULL == pPort){
-            mpMsgqPort = strdup("8002");
+            mpMsgqPort = strdup("8005");
         }
         else{
             mpMsgqPort = strdup(pPort+1);
